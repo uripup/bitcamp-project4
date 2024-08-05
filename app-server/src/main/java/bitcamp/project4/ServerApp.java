@@ -137,25 +137,31 @@ public class ServerApp {
     Hangman hangman = new Hangman();
     hangman.startNewGame();
 
-    out.writeInt(hangman.getCurrentQuiz().length()); // 글자 수 전송
-    out.writeInt(hangman.getTurnsLeft()); // 초기 턴 수 전송
-//    out.writeObject(hangman.getTopic()); // 주제 전송
-    out.writeObject(hangman.getGameState()); // 초기 게임 상태 전송
+    out.writeInt(hangman.getCurrentQuiz().length());
+    out.writeInt(hangman.getTurnsLeft());
+    out.writeObject(hangman.getGameState());
     out.flush();
 
     while (!hangman.isGameOver()) {
       char guess = in.readChar();
-      boolean correctGuess = hangman.processGuess(guess);
+      boolean isNewGuess = hangman.isNewGuess(guess);
+      boolean correctGuess = false;
 
-      out.writeBoolean(correctGuess);
-      out.writeInt(hangman.getTurnsLeft());
-      out.writeObject(hangman.getDisplayWord());
-      out.writeBoolean(hangman.isGameOver());
-      out.writeObject(hangman.getGameState()); // 현재 게임 상태 전송
+      if (isNewGuess) {
+        correctGuess = hangman.processGuess(guess);
+      }
+
+      out.writeBoolean(isNewGuess);
+      if (isNewGuess) {
+        out.writeBoolean(correctGuess);
+        out.writeInt(hangman.getTurnsLeft());
+        out.writeObject(hangman.getDisplayWord());
+        out.writeBoolean(hangman.isGameOver());
+        out.writeObject(hangman.getGameState());
+      }
       out.flush();
     }
 
-    // 게임 종료 후 정답과 승패 여부 전송
     out.writeObject(hangman.getCurrentQuiz());
     out.writeBoolean(hangman.isWin());
     out.flush();

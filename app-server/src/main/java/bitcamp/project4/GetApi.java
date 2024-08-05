@@ -51,7 +51,7 @@ public class GetApi {
     }
   }
 
-  public void sendRequest(int situation) {
+  public void sendRequest(int situation, String word) {
     CloseableHttpClient httpClient = HttpClients.createDefault();
     ObjectMapper objectMapper = new ObjectMapper();
     String prompt;
@@ -59,7 +59,7 @@ public class GetApi {
     switch (situation) {
       case 1:
         prompt =
-            "Your next reply must consist of only a single English word without any introduction. You are Daniel, a teenager living in New York City. Daniel's recent hobby is collecting everyday English words they uses and writing them in their diary. Now, think of 20 random English words in your mind. Then, tell me the 14th word you thought of. Don't include quotation marks (Examples: Apple, Serendipity).";
+            "Imagine that you are an English teacher and are currently playing a game of Hangman with your students. You need to give a hint for the word *"+ word + "*. Provide a simple and concise explanation in one sentence. However, you must not directly mention any of the letters in the given word. Your next reply must be in Korean. Example: 이 단어는 빨갛고 단 맛이 나는 과일을 가리킵니다.";
         break;
       case 2:
         prompt =
@@ -74,7 +74,7 @@ public class GetApi {
     }
 
     String requestBody = String.format(
-        "{\"model\": \"gpt-4o-mini\", \"messages\": [{\"role\": \"user\", \"content\": \"%s\"}], \"max_tokens\": 100, \"temperature\": 0.8 }",
+        "{\"model\": \"gpt-4o\", \"messages\": [{\"role\": \"user\", \"content\": \"%s\"}], \"max_tokens\": 100, \"temperature\": 0.8 }",
         prompt);
 
     try {
@@ -110,7 +110,7 @@ public class GetApi {
   }
 
   public String getAssistantReply() {
-    System.out.println("퀴즈는"+ assistantReply);
+    System.out.println("힌트는"+ assistantReply);
     return assistantReply;
   }
 

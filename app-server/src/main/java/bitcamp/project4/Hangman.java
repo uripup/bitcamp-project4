@@ -12,7 +12,7 @@ public class Hangman {
   private String hint;
   private int wrongGuesses;
 
-//  GetApi aiQuiz = new GetApi();
+  GetApi aiHint = new GetApi();
 
   RandomWordApi randomWord = new RandomWordApi();
 
@@ -25,8 +25,9 @@ public class Hangman {
     try {
       currentQuiz=randomWord.getRandomWords(1).get(0);
       System.out.println(currentQuiz);
+      aiHint.sendRequest(1, currentQuiz);
       if (currentQuiz.isEmpty()) {
-        throw new IllegalStateException("퀴즈 목록이 비어있습니다.");
+        throw new IllegalStateException("퀴즈를 받아오지 못했습니다.");
       }
     } catch (Exception e) {
       System.out.println("퀴즈를 불러오는 중 오류가 발생했습니다: " + e.getMessage());
@@ -36,7 +37,7 @@ public class Hangman {
     guessedLetters.clear();
     turnsLeft = MAX_TRIES - wrongGuesses;
     //        topic = currentQuiz.getTopic();
-    //        hint = currentQuiz.getHint();
+    hint = aiHint.getAssistantReply();
     wrongGuesses = 0;
   }
 
@@ -46,12 +47,6 @@ public class Hangman {
     }
 
     guess = Character.toLowerCase(guess);
-    boolean alreadyGuessed = guessedLetters.contains(guess);
-
-    if (alreadyGuessed) {
-      return false;  // 이미 추측한 글자는 false를 반환
-    }
-
     guessedLetters.add(guess);
 
     if (currentQuiz.toLowerCase().indexOf(guess) == -1) {
@@ -75,6 +70,11 @@ public class Hangman {
     }
     return display.toString().trim();
   }
+
+  public boolean isNewGuess(char guess) {
+    return !guessedLetters.contains(Character.toLowerCase(guess));
+  }
+
 
   public boolean isGameOver() {
     return turnsLeft == 0 || getDisplayWord().replace(" ", "").equalsIgnoreCase(currentQuiz);
@@ -125,9 +125,9 @@ public class Hangman {
     state.append("Guessed letters: ")
         .append(String.join(", ", guessedLetters.stream().map(String::valueOf).sorted().toList()))
         .append("\n");
-    //        if (shouldShowHint()) {
-    //            state.append("Hint: ").append(hint).append("\n");
-    //        }
+            if (shouldShowHint()) {
+                state.append("Hint: ").append(hint).append("\n");
+            }
     return state.toString();
   }
 }

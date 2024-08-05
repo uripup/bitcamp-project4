@@ -137,6 +137,12 @@ public class ClientApp {
         out.writeChar(guess);
         out.flush();
 
+        boolean isNewGuess = in.readBoolean();
+        if (!isNewGuess) {
+          System.out.println("이미 입력했던 글자입니다.");
+          continue;
+        }
+
         boolean correctGuess = in.readBoolean();
         turnsLeft = in.readInt();
         String currentWord = (String) in.readObject();
